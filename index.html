@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f0f0f" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="MyakTube" />
+  <meta name="description" content="Offline personal media library - stream your own videos and music locally." />
+  <title>MyakTube – Offline Media</title>
+  <link rel="icon" href="logo.png" type="image/png" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <!-- Install app banner (shown when PWA is installable) -->
+  <div class="install-banner hidden" id="install-banner">
+    <p class="install-banner-text">Install MyakTube to use it offline and add to your home screen.</p>
+    <div class="install-banner-actions">
+      <button type="button" class="btn btn-primary" id="install-app-btn">Install app</button>
+      <button type="button" class="btn btn-secondary install-dismiss" id="install-dismiss-btn">Not now</button>
+    </div>
+  </div>
+
+  <div class="sidebar-backdrop" id="sidebar-backdrop" aria-hidden="true"></div>
+  <div class="app">
+    <!-- Left sidebar: Playlists -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h1 class="logo">
+          <img src="logo.png" alt="MyakTube" class="site-logo" />
+        </h1>
+        <p class="tagline">Offline media</p>
+      </div>
+      <div class="playlist-actions">
+        <button type="button" class="btn btn-primary" id="create-playlist-btn" aria-label="Create playlist">
+          <span class="btn-icon">+</span> Create playlist
+        </button>
+      </div>
+      <nav class="playlist-nav">
+        <button type="button" class="playlist-item active" data-playlist-id="all" aria-current="page">
+          <span class="playlist-name">All Media</span>
+          <span class="playlist-count" id="all-media-count">0</span>
+        </button>
+        <ul class="playlist-list" id="playlist-list"></ul>
+      </nav>
+    </aside>
+
+    <!-- Main content -->
+    <main class="main">
+      <!-- Search bar -->
+      <header class="topbar">
+        <div class="search-wrap">
+          <span class="search-icon" aria-hidden="true">⌕</span>
+          <input
+            type="search"
+            id="search-input"
+            class="search-input"
+            placeholder="Search media..."
+            autocomplete="off"
+            aria-label="Search media by name"
+          />
+          <button type="button" class="search-clear hidden" id="search-clear" aria-label="Clear search">×</button>
+        </div>
+        <div class="upload-zone" id="upload-zone">
+          <input type="file" id="file-input" accept="audio/*,video/*" multiple hidden />
+          <button type="button" class="btn btn-upload" id="upload-btn">
+            <span class="btn-icon">↑</span> Upload
+          </button>
+          <p class="upload-hint">or drag & drop files here</p>
+        </div>
+      </header>
+
+      <!-- Current view title -->
+      <div class="view-header">
+        <h2 class="view-title" id="view-title">All Media</h2>
+      </div>
+
+      <!-- Media grid -->
+      <section class="media-grid" id="media-grid">
+        <div class="empty-state" id="empty-state">
+          <p>No media yet. Upload audio or video files to get started.</p>
+          <p class="empty-hint">Use the upload button above or drag & drop files.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Now Playing (sticky bottom) -->
+  <footer class="now-playing" id="now-playing" hidden>
+    <button type="button" class="back-btn-nowplaying" id="back-nowplaying-btn" aria-label="Back">← Back</button>
+    <div class="now-playing-info">
+      <span class="now-playing-name" id="now-playing-name">—</span>
+      <span class="now-playing-type" id="now-playing-type"></span>
+    </div>
+    <div class="now-playing-controls">
+      <button type="button" class="control-btn" id="prev-btn" aria-label="Previous">⏮</button>
+      <button type="button" class="control-btn control-btn-play" id="play-pause-btn" aria-label="Play / Pause">▶</button>
+      <button type="button" class="control-btn" id="next-btn" aria-label="Next">⏭</button>
+      <button type="button" class="control-btn control-btn-loop" id="loop-btn" aria-label="Loop current track" title="Loop">🔁</button>
+    </div>
+    <div class="now-playing-progress">
+      <input type="range" class="progress-slider" id="progress-slider" min="0" max="100" value="0" aria-label="Seek" />
+      <span class="time-current" id="time-current">0:00</span>
+      <span class="time-total" id="time-total">0:00</span>
+    </div>
+    <audio id="audio-player" preload="metadata"></audio>
+    <video id="video-player" preload="metadata" controlsList="nodownload"></video>
+  </footer>
+
+  <!-- Modal: Create playlist -->
+  <div class="modal-overlay hidden" id="create-playlist-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal">
+      <h3 id="modal-title">New playlist</h3>
+      <input type="text" id="playlist-name-input" class="modal-input" placeholder="Playlist name" maxlength="100" />
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" id="modal-cancel">Cancel</button>
+        <button type="button" class="btn btn-primary" id="modal-create">Create</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Add to playlist -->
+  <div class="modal-overlay hidden" id="add-to-playlist-modal" role="dialog" aria-modal="true" aria-labelledby="add-modal-title">
+    <div class="modal">
+      <h3 id="add-modal-title">Add to playlist</h3>
+      <ul class="playlist-pick-list" id="playlist-pick-list"></ul>
+      <p class="modal-hint hidden" id="no-playlists-hint">Create a playlist first.</p>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" id="add-modal-close">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Video fullscreen overlay (for video playback) -->
+  <div class="video-overlay" id="video-overlay">
+    <div class="video-overlay-top">
+      <button type="button" class="back-btn-video" id="close-video-btn" aria-label="Back">← Back</button>
+      <button type="button" class="control-btn-loop-overlay" id="loop-video-overlay-btn" aria-label="Loop video" title="Loop">🔁</button>
+    </div>
+    <video id="video-overlay-player" controls preload="metadata" controlsList="nodownload"></video>
+  </div>
+
+  <script src="js/db.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
