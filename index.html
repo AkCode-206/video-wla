@@ -11,16 +11,26 @@
   <title>MyakTube – Offline Media</title>
   <link rel="icon" href="logo.png" type="image/png" />
   <link rel="manifest" href="manifest.json" />
-  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="logo.png" />
   <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
-  <!-- Install app banner (shown when PWA is installable) -->
+  <!-- Install app banner (shown when PWA is installable on Android Chrome) -->
   <div class="install-banner hidden" id="install-banner">
     <p class="install-banner-text">Install MyakTube to use it offline and add to your home screen.</p>
     <div class="install-banner-actions">
       <button type="button" class="btn btn-primary" id="install-app-btn">Install app</button>
       <button type="button" class="btn btn-secondary install-dismiss" id="install-dismiss-btn">Not now</button>
+    </div>
+  </div>
+
+  <!-- How to install (shown on mobile when browser doesn't show install prompt, e.g. iOS) -->
+  <div class="install-how-to hidden" id="install-how-to">
+    <div class="install-how-to-inner">
+      <h3>Add to Home Screen</h3>
+      <p class="install-how-to-ios"><strong>iPhone / iPad:</strong> Tap <span class="share-icon">↑</span> Share, then scroll and tap <strong>Add to Home Screen</strong>.</p>
+      <p class="install-how-to-android"><strong>Android:</strong> Tap <span class="menu-icon">⋮</span> menu, then <strong>Install app</strong> or <strong>Add to Home screen</strong>.</p>
+      <button type="button" class="btn btn-primary" id="install-how-to-close">Got it</button>
     </div>
   </div>
 
@@ -69,6 +79,7 @@
           <button type="button" class="btn btn-upload" id="upload-btn">
             <span class="btn-icon">↑</span> Upload
           </button>
+          <button type="button" class="btn btn-install-link" id="install-app-link" aria-label="Install app">↓ Install app</button>
           <p class="upload-hint">or drag & drop files here</p>
         </div>
       </header>

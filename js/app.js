@@ -537,15 +537,21 @@
   const installBanner = document.getElementById('install-banner');
   const installAppBtn = document.getElementById('install-app-btn');
   const installDismissBtn = document.getElementById('install-dismiss-btn');
+  const installAppLink = document.getElementById('install-app-link');
+  const installHowTo = document.getElementById('install-how-to');
+  const installHowToClose = document.getElementById('install-how-to-close');
   const INSTALL_DISMISSED_KEY = 'myaktube-install-dismissed';
 
   let deferredInstallPrompt = null;
 
+  function isStandalone() {
+    return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  }
+
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredInstallPrompt = e;
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-    if (!isStandalone && !localStorage.getItem(INSTALL_DISMISSED_KEY) && installBanner) {
+    if (!isStandalone() && !localStorage.getItem(INSTALL_DISMISSED_KEY) && installBanner) {
       installBanner.classList.remove('hidden');
     }
   });
@@ -567,9 +573,38 @@
     });
   }
 
+  if (installAppLink) {
+    if (isStandalone()) installAppLink.style.display = 'none';
+    installAppLink.addEventListener('click', async () => {
+      if (isStandalone()) return;
+      if (deferredInstallPrompt) {
+        deferredInstallPrompt.prompt();
+        const { outcome } = await deferredInstallPrompt.userChoice;
+        deferredInstallPrompt = null;
+        if (installBanner) installBanner.classList.add('hidden');
+      } else if (installHowTo) {
+        installHowTo.classList.remove('hidden');
+      }
+    });
+  }
+
+  if (installHowToClose) {
+    installHowToClose.addEventListener('click', () => {
+      if (installHowTo) installHowTo.classList.add('hidden');
+    });
+  }
+
+  if (installHowTo) {
+    installHowTo.addEventListener('click', (e) => {
+      if (e.target === installHowTo) installHowTo.classList.add('hidden');
+    });
+  }
+
   window.addEventListener('appinstalled', () => {
     deferredInstallPrompt = null;
     if (installBanner) installBanner.classList.add('hidden');
+    if (installHowTo) installHowTo.classList.add('hidden');
+    if (installAppLink) installAppLink.style.display = 'none';
     try { localStorage.removeItem(INSTALL_DISMISSED_KEY); } catch (_) {}
   });
 

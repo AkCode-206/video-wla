@@ -75,6 +75,67 @@ body {
   flex-shrink: 0;
 }
 
+/* How to install (manual instructions for iOS etc.) */
+.install-how-to {
+  position: fixed;
+  inset: 0;
+  z-index: 350;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.install-how-to.hidden {
+  display: none;
+}
+
+.install-how-to-inner {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  max-width: 360px;
+  width: 100%;
+}
+
+.install-how-to-inner h3 {
+  margin: 0 0 1rem;
+  font-size: 1.15rem;
+}
+
+.install-how-to-inner p {
+  margin: 0 0 0.75rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.install-how-to-inner .btn {
+  margin-top: 1rem;
+  width: 100%;
+}
+
+.btn-install-link {
+  background: transparent;
+  color: var(--accent);
+  font-size: 0.85rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--accent);
+}
+
+.btn-install-link:hover {
+  background: var(--bg-elevated);
+}
+
+@media (min-width: 769px) {
+  .btn-install-link {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.6rem;
+  }
+}
+
 .app {
   display: grid;
   grid-template-columns: var(--sidebar-width) 1fr;
